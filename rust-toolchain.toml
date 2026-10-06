@@ -1,0 +1,6 @@
+# Use stable; Anchor 0.32 works with recent stable Rust for host builds.
+# Solana SBF uses its own platform tools via `cargo-build-sbf`.
+[toolchain]
+channel = "stable"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

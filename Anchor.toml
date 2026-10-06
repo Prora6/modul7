@@ -1,0 +1,25 @@
+[toolchain]
+package_manager = "yarn"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+mini_launchpad = "HTFq7QrFVyHsWReXeh8mjE2Bv69d6UTUUtMG1ZZz9eC6"
+
+[programs.devnet]
+mini_launchpad = "HTFq7QrFVyHsWReXeh8mjE2Bv69d6UTUUtMG1ZZz9eC6"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[test.validator]
+bind_address = "127.0.0.1"
+
+[scripts]
+test = "yarn run mocha -t 1000000 tests/"
