@@ -16,11 +16,10 @@ Built from course modules **Oracle** + **Token Factory** (sources kept under [`_
 
 ### Successful token-creation transactions (Devnet)
 
-> Public Devnet faucets were rate-limited during submission (wallet balance 0 SOL; deploy needs ≈1.5 SOL for a ~281 KB program). After funding the deploy wallet, run:
+> **Status:** public Devnet faucet is currently dry / rate-limited (local IP and GitHub Actions runners both get HTTP 429). Program ID + oracle PDA below are fixed for this keypair; CI workflow [Devnet deploy](https://github.com/Prora6/modul7/actions/workflows/devnet-deploy.yml) retries every 2h and will auto-fill explorer links when an airdrop succeeds.
 >
+> Manual path once the wallet has ≥2 SOL:
 > `wsl -e bash scripts/wsl_devnet.sh`
->
-> That script deploys, initializes the oracle, and creates 3 tokens. Paste explorer links below:
 
 1. _(initialize_oracle / deploy)_
 2. _(create_token_with_fee #1)_

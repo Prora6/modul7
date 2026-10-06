@@ -2,33 +2,61 @@ name: Devnet deploy
 
 on:
   workflow_dispatch:
+  schedule:
+    # Retry while public Devnet faucet is dry / rate-limited
+    - cron: "15 */2 * * *"
   push:
     paths:
       - ".github/workflows/devnet-deploy.yml"
       - "scripts/ci_devnet.sh"
+      - "scripts/patch_readme_devnet.sh"
       - "deploy-artifacts/**"
+
+concurrency:
+  group: devnet-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-22.04
-    timeout-minutes: 45
+    timeout-minutes: 50
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
+      - name: Skip if already deployed with txs noted
+        id: gate
+        run: |
+          if grep -q 'create_token_with_fee #1' README.md && grep -q 'explorer.solana.com/tx/' README.md && ! grep -q '_(initialize_oracle / deploy)_' README.md; then
+            if curl -sS "https://api.devnet.solana.com" -H 'Content-Type: application/json' \
+              -d '{"jsonrpc":"2.0","id":1,"method":"getAccountInfo","params":["HTFq7QrFVyHsWReXeh8mjE2Bv69d6UTUUtMG1ZZz9eC6",{"encoding":"base64"}]}' \
+              | grep -q '"value":{'; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "Program already on Devnet and README has tx links"
+              exit 0
+            fi
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
       - name: Install Solana CLI
+        if: steps.gate.outputs.skip != 'true'
         run: |
           sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.21/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
 
       - uses: actions/setup-node@v4
+        if: steps.gate.outputs.skip != 'true'
         with:
           node-version: "20"
           cache: yarn
 
       - name: Yarn install
+        if: steps.gate.outputs.skip != 'true'
         run: yarn install --frozen-lockfile
 
       - name: Prepare artifacts
+        if: steps.gate.outputs.skip != 'true'
         run: |
           mkdir -p target/deploy target/idl "$HOME/.config/solana"
           cp deploy-artifacts/mini_launchpad.so target/deploy/mini_launchpad.so
@@ -39,15 +67,16 @@ jobs:
           echo "DEPLOYER=$(solana-keygen pubkey)"
 
       - name: Fund deployer (airdrop retries)
+        if: steps.gate.outputs.skip != 'true'
         run: |
           set +e
           PUB=$(solana-keygen pubkey)
-          for i in $(seq 1 40); do
+          for i in $(seq 1 60); do
             echo "airdrop attempt $i for $PUB"
             solana airdrop 2 "$PUB" && break
             solana airdrop 1 "$PUB" && break
             solana airdrop 0.5 "$PUB" && break
-            sleep 15
+            sleep 20
           done
           set -e
           solana balance
@@ -55,10 +84,31 @@ jobs:
           awk -v b="$bal" 'BEGIN { if (b+0 < 1.5) { print "Need >=1.5 SOL, got", b; exit 1 } }'
 
       - name: Deploy + init + create tokens
+        if: steps.gate.outputs.skip != 'true'
         run: bash scripts/ci_devnet.sh
 
+      - name: Patch README with explorer links
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          chmod +x scripts/patch_readme_devnet.sh
+          bash scripts/patch_readme_devnet.sh
+          cat README.md | sed -n '1,40p'
+
+      - name: Commit README
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "No README changes"
+          else
+            git commit -m "docs: add Devnet explorer transaction links"
+            git push
+          fi
+
       - name: Upload outputs
-        if: always()
+        if: always() && steps.gate.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: devnet-outputs
