@@ -1,0 +1,19 @@
+{
+  "name": "mini-launchpad-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "ts-node src/feeder.ts",
+    "feeder": "ts-node src/feeder.ts"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/web3.js": "^1.95.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
