@@ -16,14 +16,12 @@ Built from course modules **Oracle** + **Token Factory** (sources kept under [`_
 
 ### Successful token-creation transactions (Devnet)
 
-> **Status:** public Devnet faucet is currently dry / rate-limited (local IP and GitHub Actions runners both get HTTP 429). Program ID + oracle PDA below are fixed for this keypair; CI workflow [Devnet deploy](https://github.com/Prora6/modul7/actions/workflows/devnet-deploy.yml) retries every 2h and will auto-fill explorer links when an airdrop succeeds.
->
-> Manual path once the wallet has ≥2 SOL:
-> `wsl -e bash scripts/wsl_devnet.sh`
+1. [initialize_oracle](https://explorer.solana.com/tx/4CA8Hoi1j94cCRbgfUYsrELecQWmFxkveNNyVtVM9o5iZaSRHHQYQ2d6FFXAFxeW6Qzfczk9tMFqKR39CY36uRD8?cluster=devnet) — `4CA8Hoi1j94cCRbgfUYsrELecQWmFxkveNNyVtVM9o5iZaSRHHQYQ2d6FFXAFxeW6Qzfczk9tMFqKR39CY36uRD8`
+2. [create_token_with_fee #1](https://explorer.solana.com/tx/2c6GNwcjTbKF6R5CYH549V8VGqBVNHGEt7zy9qKdTTHY9XcHNZL7Ptejaenopc6dHh3m592m9mNP4r58M4evGgv9?cluster=devnet) — `2c6GNwcjTbKF6R5CYH549V8VGqBVNHGEt7zy9qKdTTHY9XcHNZL7Ptejaenopc6dHh3m592m9mNP4r58M4evGgv9`
+3. [create_token_with_fee #2](https://explorer.solana.com/tx/3ccYXegZzNxUT9Hy7ytp2JAmHVXpUoNSonUUDhZ7NNWooQsPkeYfjjKkLMqMiyHZiQsCBTXHaiRKQMB6X6hxNa2k?cluster=devnet) — `3ccYXegZzNxUT9Hy7ytp2JAmHVXpUoNSonUUDhZ7NNWooQsPkeYfjjKkLMqMiyHZiQsCBTXHaiRKQMB6X6hxNa2k`
+4. [create_token_with_fee #3](https://explorer.solana.com/tx/zDfvbVri8kp37T96DQjiGXiwbcXwcfvVst63qdYQ3pcDQcjex5LEZy1v6ofdYWSEq8N6nMc8ARhfoXPR4rBgsuV?cluster=devnet) — `zDfvbVri8kp37T96DQjiGXiwbcXwcfvVst63qdYQ3pcDQcjex5LEZy1v6ofdYWSEq8N6nMc8ARhfoXPR4rBgsuV`
 
-1. _(initialize_oracle / deploy)_
-2. _(create_token_with_fee #1)_
-3. _(create_token_with_fee #2)_
+Program deploy: [2yVSucJU…](https://explorer.solana.com/tx/2yVSucJUUfyuBiaiVDJH5bCHccxuj59m5jA3RKAV6zptqWESKMyXKB7N2H5R6SKE6sHY7ASD2Vo4FENZu3VnSobd?cluster=devnet)
 
 ### Localnet verification (already run)
 
