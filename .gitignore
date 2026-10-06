@@ -21,3 +21,10 @@ frontend/node_modules
 scripts/_airdrop_try.py
 scripts/_fund_devnet.sh
 scripts/_retry_devnet_until_funded.sh
+scripts/_pow_until_funded.sh
+scripts/_poll_devnet_deploy.sh
+scripts/_airdrop_via_proxy.sh
+scripts/_airdrop_proxyscrape.sh
+scripts/_airdrop_socks5.sh
+scripts/_airdrop_fresh_via_socks.sh
+scripts/_try_rpc_airdrops.sh

@@ -1,0 +1,68 @@
+name: Devnet deploy
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/devnet-deploy.yml"
+      - "scripts/ci_devnet.sh"
+      - "deploy-artifacts/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.21/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p target/deploy target/idl "$HOME/.config/solana"
+          cp deploy-artifacts/mini_launchpad.so target/deploy/mini_launchpad.so
+          cp deploy-artifacts/mini_launchpad.json target/idl/mini_launchpad.json
+          test -f target/deploy/mini_launchpad-keypair.json
+          solana-keygen new --no-bip39-passphrase -o "$HOME/.config/solana/id.json" --force
+          solana config set --url https://api.devnet.solana.com
+          echo "DEPLOYER=$(solana-keygen pubkey)"
+
+      - name: Fund deployer (airdrop retries)
+        run: |
+          set +e
+          PUB=$(solana-keygen pubkey)
+          for i in $(seq 1 40); do
+            echo "airdrop attempt $i for $PUB"
+            solana airdrop 2 "$PUB" && break
+            solana airdrop 1 "$PUB" && break
+            solana airdrop 0.5 "$PUB" && break
+            sleep 15
+          done
+          set -e
+          solana balance
+          bal=$(solana balance | awk '{print $1}')
+          awk -v b="$bal" 'BEGIN { if (b+0 < 1.5) { print "Need >=1.5 SOL, got", b; exit 1 } }'
+
+      - name: Deploy + init + create tokens
+        run: bash scripts/ci_devnet.sh
+
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: devnet-outputs
+          path: |
+            /tmp/devnet-*.out
+            /tmp/ci_devnet_summary.txt
+          if-no-files-found: ignore
