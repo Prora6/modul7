@@ -1,0 +1,12 @@
+[package]
+name = "mini-launchpad-litesvm"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+litesvm = "0.6.1"
+solana-sdk = "2.1"
+spl-associated-token-account = "6"
+spl-token = "7"
+sha2 = "0.10"
