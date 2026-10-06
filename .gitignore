@@ -28,3 +28,8 @@ scripts/_airdrop_proxyscrape.sh
 scripts/_airdrop_socks5.sh
 scripts/_airdrop_fresh_via_socks.sh
 scripts/_try_rpc_airdrops.sh
+scripts/_airdrop_socks5_batch.sh
+scripts/_ci_jobs.sh
+scripts/_list_runs.sh
+scripts/_poll_ci2.sh
+scripts/_poll_ci_run.sh
